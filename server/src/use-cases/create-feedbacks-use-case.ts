@@ -1,15 +1,23 @@
 import { MailAdapter } from "../adapters/mail-adapter";
-import { CreateFeedbackRequest } from "../dto/feedbacks";
-import { FeedbackRepository } from "../repositories/feedbacks-repository";
+import { CreateFeedbackData } from "../dto/feedbacks";
+import { FeedbacksRepository } from "../repositories/feedbacks-repository";
 
 export class CreateFeedbackUseCase {
   constructor(
-    private readonly feedbackRepository: FeedbackRepository,
+    private readonly feedbackRepository: FeedbacksRepository,
     private readonly mailAdapter: MailAdapter
   ) {}
 
-  async execute(request: CreateFeedbackRequest) {
-    const feedback = await this.feedbackRepository.create(request);
+  async execute({ type, comment, screenshot }: CreateFeedbackData) {
+    if (!type || !comment) {
+      throw new Error("Type and comment are required");
+    }
+
+    const feedback = await this.feedbackRepository.create({
+      type,
+      comment,
+      screenshot,
+    });
 
     await this.mailAdapter.sendMail({
       to: "Anderson Rocha <anderson@email.com>",
