@@ -1,5 +1,6 @@
-import { ArrowLeft } from "phosphor-react";
+import { ArrowLeft, CircleNotch } from "phosphor-react";
 import { FormEvent, useState } from "react";
+import { api } from "../../../services/api";
 import { CloseButton } from "../../CloseButton";
 import { ScreenshotButton } from "../../ScreenshotButton";
 import { FeedbackType, feedbackTypes } from "../feedback-types";
@@ -15,16 +16,37 @@ export function FeedbackFormStep({
   onStepOver,
   onStepComplete,
 }: Props) {
-  const [screenshot, setScreenshot] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [comment, setComment] = useState<string>("");
+  const [screenshot, setScreenshot] = useState<string | null>(null);
 
   const { title, image } = feedbackTypes[feedbackType!];
 
-  function handleSubmitFeedback(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmitFeedback(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setIsLoading(true);
 
-    console.log({ comment, screenshot });
+    await api.post("/feedbacks", {
+      type: feedbackType,
+      comment,
+      screenshot,
+    });
+
+    setIsLoading(false);
     onStepComplete();
+  }
+
+  if (isLoading) {
+    return (
+      <div className="relative p-10 w-full">
+        <div className="absolute left-0 right-0 top-0 bottom-0 flex items-center justify-center">
+          <CircleNotch
+            weight="bold"
+            className="w-8 h-8 animate-spin text-brand-500"
+          />
+        </div>
+      </div>
+    );
   }
 
   return (
