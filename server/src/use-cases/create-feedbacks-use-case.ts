@@ -28,6 +28,7 @@ export class CreateFeedbackUseCase {
         "<p>Você recebeu um novo feedback.</p>",
         `<p><strong>Tipo:</strong> ${feedback.type}</p>`,
         `<p><strong>Comentário:</strong> ${feedback.comment}</p>`,
+        screenshot ? `<p><img src="${feedback.screenshot}"></p>` : "",
         "</div>",
       ].join("\n"),
     });
